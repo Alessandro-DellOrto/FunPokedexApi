@@ -1,4 +1,5 @@
 ﻿using FunPokedexApi.Application.Interfaces;
+using FunPokedexApi.Application.Services;
 using FunPokedexApi.Infrastructure.ApiClients;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +18,8 @@ namespace FunPokedexApi.Infrastructure
             {
                 client.BaseAddress = new Uri("https://api.funtranslations.com/");
             });
+
+            services.AddScoped<IPokemonService, PokemonService>();
 
             return services;
         }
