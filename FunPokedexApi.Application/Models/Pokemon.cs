@@ -1,6 +1,6 @@
 ﻿namespace FunPokedexApi.Application.Models;
 
-public class Pokemon
+public record Pokemon
 {
     public string Name { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;

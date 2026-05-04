@@ -7,6 +7,7 @@ public class PokemonService : IPokemonService
 {
     private readonly IPokeApiClient _pokeApiClient;
     private readonly IFunTranslationsApiClient _funTranslationsClient;
+    private const string YodaHabitat = "cave";
 
     public PokemonService(IPokeApiClient pokeApiClient, IFunTranslationsApiClient funTranslationsClient)
     {
@@ -14,13 +15,49 @@ public class PokemonService : IPokemonService
         _funTranslationsClient = funTranslationsClient;
     }
 
-    public Task<Pokemon?> GetPokemonAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<Pokemon?> GetPokemonAsync(string name, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _pokeApiClient.GetPokemonAsync(name, cancellationToken);
     }
 
-    public Task<Pokemon?> GetTranslatedPokemonAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<Pokemon?> GetTranslatedPokemonAsync(string name, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        Pokemon? pokemon = await _pokeApiClient.GetPokemonAsync(name, cancellationToken);
+        
+        if(pokemon is null)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(pokemon.Description))
+        {
+            return pokemon;
+        }
+
+
+        bool useYoda = pokemon.IsLegendary ||
+            string.Equals(pokemon.Habitat, YodaHabitat, StringComparison.InvariantCultureIgnoreCase);
+
+        string? translated = null;
+        try
+        {
+            translated = useYoda
+            ? await _funTranslationsClient.TranslateToYodaAsync(pokemon.Description, cancellationToken)
+            : await _funTranslationsClient.TranslateToShakespeareAsync(pokemon.Description, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            //MAYDO:logException?
+        }
+
+        if (!string.IsNullOrWhiteSpace(translated))
+        {
+            return pokemon with { Description = translated };
+        }
+        else
+        {          
+            return pokemon;
+        }
+
     }
 }

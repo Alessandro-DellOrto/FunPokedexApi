@@ -196,4 +196,69 @@ public class PokemonServiceTests
         // Assert
         Assert.Null(result);
     }
+
+    [Fact]
+    public async Task GetTranslatedPokemonAsync_EmptyDescription_ReturnsPokemonWithoutTranslating()
+    {
+        // Arrange
+        var pokemon = new Pokemon
+        {
+            Name = "mewtwo",
+            Description = "",
+            Habitat = "rare",
+            IsLegendary = true
+        };
+
+        _pokeApiClientMock
+            .Setup(x => x.GetPokemonAsync("mewtwo", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(pokemon);
+
+        // Act
+        var result = await _sut.GetTranslatedPokemonAsync("mewtwo");
+
+        // Assert
+        Assert.NotNull(result);
+        _funTranslationsClientMock.Verify(x => x.TranslateToYodaAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _funTranslationsClientMock.Verify(x => x.TranslateToShakespeareAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task GetTranslatedPokemonAsync_TranslationThrows_FallsBackToOriginalDescription()
+    {
+        // Arrange
+        var pokemon = new Pokemon
+        {
+            Name = "mewtwo",
+            Description = "A rare Pokemon.",
+            Habitat = "rare",
+            IsLegendary = true
+        };
+
+        _pokeApiClientMock
+            .Setup(x => x.GetPokemonAsync("mewtwo", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(pokemon);
+
+        _funTranslationsClientMock
+            .Setup(x => x.TranslateToYodaAsync("A rare Pokemon.", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("Service unavailable"));
+
+        // Act
+        var result = await _sut.GetTranslatedPokemonAsync("mewtwo");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("A rare Pokemon.", result.Description);
+    }
+
+    [Fact]
+    public async Task GetTranslatedPokemonAsync_PokeApiThrows_PropagatesException()
+    {
+        // Arrange
+        _pokeApiClientMock
+            .Setup(x => x.GetPokemonAsync("mewtwo", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("PokeAPI unavailable"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<HttpRequestException>(() => _sut.GetTranslatedPokemonAsync("mewtwo"));
+    }
 }
