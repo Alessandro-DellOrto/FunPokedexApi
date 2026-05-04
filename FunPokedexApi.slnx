@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/tests/">
+    <Project Path="FunPokedexApi.IntegrationTests/FunPokedexApi.IntegrationTests.csproj" />
+    <Project Path="FunPokedexApi.UnitTests/FunPokedexApi.UnitTests.csproj" />
+  </Folder>
+  <Project Path="FunPokedexApi.Application/FunPokedexApi.Application.csproj" />
+  <Project Path="FunPokedexApi.Infrastructure/FunPokedexApi.Infrastructure.csproj" />
+  <Project Path="FunPokedexApi/FunPokedexApi.csproj" />
+</Solution>
