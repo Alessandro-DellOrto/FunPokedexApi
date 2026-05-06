@@ -1,6 +1,26 @@
 @FunPokedexApi_HostAddress = http://localhost:5054
 
-GET {{FunPokedexApi_HostAddress}}/weatherforecast/
+GET {{FunPokedexApi_HostAddress}}/pokemon/mewtwo
+Accept: application/json
+
+###
+
+GET {{FunPokedexApi_HostAddress}}/pokemon/zubat
+Accept: application/json
+
+###
+
+GET {{FunPokedexApi_HostAddress}}/pokemon/translated/mewtwo
+Accept: application/json
+
+###
+
+GET {{FunPokedexApi_HostAddress}}/pokemon/translated/bulbasaur
+Accept: application/json
+
+###
+
+GET {{FunPokedexApi_HostAddress}}/pokemon/unknown
 Accept: application/json
 
 ###

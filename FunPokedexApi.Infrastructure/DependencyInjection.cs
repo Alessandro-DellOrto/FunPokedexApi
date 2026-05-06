@@ -16,7 +16,7 @@ namespace FunPokedexApi.Infrastructure
 
             services.AddHttpClient<IFunTranslationsApiClient, FunTranslationsApiClient>(client =>
             {
-                client.BaseAddress = new Uri("https://api.funtranslations.com/");
+                client.BaseAddress = new Uri("https://api.funtranslations.mercxry.me/v1");
             });
 
             services.AddScoped<IPokemonService, PokemonService>();
