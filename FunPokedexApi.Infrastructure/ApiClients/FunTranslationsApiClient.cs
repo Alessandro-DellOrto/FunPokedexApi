@@ -1,7 +1,8 @@
-﻿using FunPokedexApi.Application.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Net;
 using System.Text;
+using System.Text.Json;
+using FunPokedexApi.Application.Interfaces;
+using FunPokedexApi.Infrastructure.DTOs.FunTranslations;
 
 namespace FunPokedexApi.Infrastructure.ApiClients
 {
@@ -9,19 +10,43 @@ namespace FunPokedexApi.Infrastructure.ApiClients
     {
         private readonly HttpClient _httpClient;
 
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         public FunTranslationsApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public Task<string?> TranslateToYodaAsync(string text, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<string?> TranslateToYodaAsync(string text, CancellationToken cancellationToken = default)
+            => await TranslateAsync("translate/yoda", text, cancellationToken);
 
-        public Task<string?> TranslateToShakespeareAsync(string text, CancellationToken cancellationToken = default)
+        public async Task<string?> TranslateToShakespeareAsync(string text, CancellationToken cancellationToken = default)
+            => await TranslateAsync("translate/shakespeare", text, cancellationToken);
+
+        private async Task<string?> TranslateAsync(string endpoint, string text, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var payload = new StringContent(
+                JsonSerializer.Serialize(new { text }),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _httpClient.PostAsync(endpoint, payload, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)//maybe log this
+                return null;
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var dto = JsonSerializer.Deserialize<TranslationResponseDto>(content, JsonOptions);
+
+            return string.IsNullOrWhiteSpace(dto?.Contents?.Translated)
+                ? null
+                : dto.Contents.Translated;
         }
     }
 }
