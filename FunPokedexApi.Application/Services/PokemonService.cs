@@ -1,5 +1,6 @@
 ﻿using FunPokedexApi.Application.Interfaces;
 using FunPokedexApi.Application.Models;
+using Microsoft.Extensions.Logging;
 
 namespace FunPokedexApi.Application.Services;
 
@@ -7,12 +8,14 @@ public class PokemonService : IPokemonService
 {
     private readonly IPokeApiClient _pokeApiClient;
     private readonly IFunTranslationsApiClient _funTranslationsClient;
+    private readonly ILogger<PokemonService> _logger;
     private const string YodaHabitat = "cave";
 
-    public PokemonService(IPokeApiClient pokeApiClient, IFunTranslationsApiClient funTranslationsClient)
+    public PokemonService(IPokeApiClient pokeApiClient, IFunTranslationsApiClient funTranslationsClient, ILogger<PokemonService> logger)
     {
         _pokeApiClient = pokeApiClient;
         _funTranslationsClient = funTranslationsClient;
+        _logger = logger;
     }
 
     public async Task<Pokemon?> GetPokemonAsync(string name, CancellationToken cancellationToken = default)
@@ -47,7 +50,7 @@ public class PokemonService : IPokemonService
         }
         catch (Exception ex)
         {
-            //MAYDO:logException?
+            _logger.LogWarning(ex, "Translation failed for pokemon '{Name}', falling back to original description.", name);
         }
 
         if (!string.IsNullOrWhiteSpace(translated))

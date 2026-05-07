@@ -1,6 +1,7 @@
 ﻿using FunPokedexApi.Application.Interfaces;
 using FunPokedexApi.Application.Models;
 using FunPokedexApi.Application.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace FunPokedexApi.UnitTests.Services;
@@ -15,7 +16,9 @@ public class PokemonServiceTests
     {
         _pokeApiClientMock = new Mock<IPokeApiClient>();
         _funTranslationsClientMock = new Mock<IFunTranslationsApiClient>();
-        _sut = new PokemonService(_pokeApiClientMock.Object, _funTranslationsClientMock.Object);
+        _sut = new PokemonService(  _pokeApiClientMock.Object, 
+                                    _funTranslationsClientMock.Object, 
+                                    Mock.Of<ILogger<PokemonService>>());
     }
 
     // -------------------------
