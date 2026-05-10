@@ -1,5 +1,6 @@
 ﻿using FunPokedexApi.Application.Interfaces;
 using FunPokedexApi.Application.Models;
+using FunPokedexApi.Validators;
 
 namespace FunPokedexApi.Endpoints;
 
@@ -9,8 +10,8 @@ public static class PokemonEndpoints
     {
         app.MapGet("/pokemon/{name}", async (string name, IPokemonService pokemonService, CancellationToken cancellationToken) =>
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return Results.BadRequest("Pokemon name cannot be empty.");
+            if (!PokemonNameValidator.IsValid(name))
+                return Results.BadRequest("Invalid Pokemon name. Name cannot be empty, white space or composed only by digits. You can use lowercase letters, numbers and hyphens only (e.g. 'mr-mime', 'nidoran-f').");
 
             var pokemon = await pokemonService.GetPokemonAsync(name, cancellationToken);
 
@@ -26,8 +27,8 @@ public static class PokemonEndpoints
 
         app.MapGet("/pokemon/translated/{name}", async (string name, IPokemonService pokemonService, CancellationToken cancellationToken) =>
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return Results.BadRequest("Pokemon name cannot be empty.");
+            if (!PokemonNameValidator.IsValid(name))
+                return Results.BadRequest("Invalid Pokemon name. Name cannot be empty, white space or composed only by digits. You can use lowercase letters, numbers and hyphens only (e.g. 'mr-mime', 'nidoran-f').");
 
             var pokemon = await pokemonService.GetTranslatedPokemonAsync(name, cancellationToken);
 

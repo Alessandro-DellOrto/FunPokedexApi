@@ -27,6 +27,9 @@ namespace FunPokedexApi.Infrastructure.ApiClients
             if (response.StatusCode == HttpStatusCode.NotFound)
                 return null;
 
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+                throw new ArgumentException($"Invalid Pokemon name: '{name}'.");
+
             response.EnsureSuccessStatusCode();
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken);

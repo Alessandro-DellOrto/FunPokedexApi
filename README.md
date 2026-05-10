@@ -18,9 +18,17 @@ translates descriptions using the FunTranslations API.
 | GET | `/pokemon/translated/{name}` | Returns Pokémon info with translated description |
 
 ### Translation logic
-- `isLegendary = true` or `habitat = "cave"` → Yoda translation
-- Otherwise → Shakespeare translation
-- If translation fails (rate limit, unavailable) → fallback to original description
+- Pokemon with `habitat = "cave"` or `isLegendary = true` → Yoda translation
+- All other Pokemon → Shakespeare translation
+- If translation fails for any reason (rate limit, service unavailable, etc.) → fallback to original description
+
+### Input validation
+Pokemon names must contain only letters, numbers and hyphens. The following inputs are rejected with a `400 Bad Request`:
+- Empty or white space
+- Names composed only of digits (IDs are not accepted, names only)
+- Names with special characters or spaces
+
+Valid examples: `mewtwo`, `mr-mime`, `nidoran-f`, `porygon2`, `ho-oh`
 
 ### Example response
 ```json
@@ -124,6 +132,7 @@ FunPokedexApi/
 ├── FunPokedexApi/                  # Web layer
 │   ├── Endpoints/
 │   ├── Middleware/
+│   ├── Validators/
 │   └── Program.cs
 ├── FunPokedexApi.Application/      # Business logic
 │   ├── Interfaces/
@@ -135,8 +144,12 @@ FunPokedexApi/
 │   └── DependencyInjection.cs
 └── tests/
     ├── FunPokedexApi.UnitTests/
-    └── FunPokedexApi.IntegrationTests/
+    └── FunPokedexApi.IntegrationTests/  # Scaffolded, see note below
 ```
+
+> **Integration Tests:** The `FunPokedexApi.IntegrationTests` project is scaffolded and ready.
+> The recommended approach is **WireMock.Net** alongside **WebApplicationFactory** to spin up 
+> the application in memory and simulate external API responses without hitting real endpoints.
 
 ---
 

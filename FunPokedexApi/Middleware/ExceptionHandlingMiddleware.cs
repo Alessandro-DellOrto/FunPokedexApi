@@ -20,6 +20,10 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (ArgumentException ex)
+        {
+            await WriteErrorResponse(context, HttpStatusCode.BadRequest, ex.Message);
+        }
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "External API error");

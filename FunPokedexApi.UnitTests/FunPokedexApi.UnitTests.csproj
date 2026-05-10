@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FunPokedexApi.Application\FunPokedexApi.Application.csproj" />
     <ProjectReference Include="..\FunPokedexApi.Infrastructure\FunPokedexApi.Infrastructure.csproj" />
+    <ProjectReference Include="..\FunPokedexApi\FunPokedexApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

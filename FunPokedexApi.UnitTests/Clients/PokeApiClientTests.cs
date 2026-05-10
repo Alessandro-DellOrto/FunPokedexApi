@@ -9,7 +9,7 @@ namespace FunPokedexApi.UnitTests.Clients;
 
 public class PokeApiClientTests
 {
-    // Helper method to create a FunTranslationsApiClient with a mocked HttpMessageHandler
+    // Helper method to create a PokeApiClient with a mocked HttpMessageHandler
     private static PokeApiClient CreateClient(HttpResponseMessage response)
     {
         var handlerMock = new Mock<HttpMessageHandler>();
@@ -159,5 +159,18 @@ public class PokeApiClientTests
 
         // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(() => client.GetPokemonAsync("mewtwo"));
+    }
+
+    [Fact]
+    public async Task GetPokemonAsync_BadRequest_ThrowsArgumentException()
+    {
+        // Arrange
+        var client = CreateClient(new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.BadRequest
+        });
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentException>(() => client.GetPokemonAsync("dd f"));
     }
 }
